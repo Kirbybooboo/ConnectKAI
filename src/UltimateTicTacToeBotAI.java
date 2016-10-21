@@ -55,7 +55,7 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 				}
 			}
 		}
-		//determine whether you can win from going in vertical direction. Does not take into account of areas already won
+		//determine whether you can win from going in vertical direction.
 		for (x = 0; x < width; x++)
 		{
 			int count = 0;
@@ -68,12 +68,32 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 				else {
 					count = 0;
 				}
-				if (count >= kLength)
-				{
+				if (count >= kLength) {
 					potentialWins++;
 				}
 			}
 		}
+		
+		//determine whether you can win from going in bottom-left -> top-right diagonal direction.
+		for (y = 0; y < height-kLength; y++) {
+			int count = 0;
+			int y2 = 0;
+			x = 0;
+			while (x < width && y2 < height) {
+				if (state.getSpace(x,y+y2) == player || state.getSpace(x,y+2) == 0) {
+					count++;
+				}
+				else {
+					count = 0;
+				}
+				if (count >= kLength) {
+					potentialWins++;
+				}
+				x++;
+				y2++;
+			}
+		}
+		
 		System.out.println(potentialWins);
 		return potentialWins;
 	}
