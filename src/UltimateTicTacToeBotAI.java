@@ -12,11 +12,11 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 
 	@Override
 	public Point getMove(BoardModel state) {
+		heuristic(state);
 		int i = ThreadLocalRandom.current().nextInt(0,state.getWidth());
 		int j = ThreadLocalRandom.current().nextInt(0,state.getHeight());
 		if (state.getSpace(i, j) == 0)
 		{
-			System.out.println(state.toString());
 			return new Point(i,j);
 		}
 		return getMove(state);
@@ -38,14 +38,17 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 		//determine whether you can win from going in horizontal direction. Does not take into account of areas already won
 		for (y = 0; y < height; y++)
 		{
-			for (int i = 0; i < width; i++) {
-				int count = 0;
-				if (x+i == player || x+i == 0) {
+			int count = 0;
+			for (x = 0; x < width; x++) {
+				if (state.getSpace(x,y) == player || state.getSpace(x,y) == 0) {
 					count++;
 				}
 				else {
 					count = 0;
 				}
+				System.out.println("y = " + y);
+				System.out.println("count = " + count);
+				System.out.println("kLength = " + kLength);
 				if (count >= kLength)
 				{
 					potentialWins++;
@@ -55,9 +58,11 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 		//determine whether you can win from going in vertical direction. Does not take into account of areas already won
 		for (x = 0; x < width; x++)
 		{
-			for (int j = 0; j < height; j++) {
-				int count = 0;
-				if (y+j == player || y+j == 0) {
+			int count = 0;
+			for (y = 0; y < height; y++) {
+				System.out.println("x = " + x);
+				System.out.println("y = " + y);
+				if (state.getSpace(x,y) == player || state.getSpace(x,y) == 0) {
 					count++;
 				}
 				else {
@@ -69,7 +74,7 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 				}
 			}
 		}
-		
+		System.out.println(potentialWins);
 		return potentialWins;
 	}
 }
