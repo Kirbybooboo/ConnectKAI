@@ -4,7 +4,8 @@ import java.awt.Point;
 
 public class UltimateTicTacToeBotAI extends CKPlayer {
 	
-	private static final int DEPTH = 3;
+	private static final int DEPTH = 4;
+	
 
 	public UltimateTicTacToeBotAI(byte player, BoardModel state) {
 		super(player, state);
@@ -27,23 +28,23 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 	
 	public Point mmSearch(BoardModel state) {
 		Point bestMove = new Point();	
-		int maxValue = -10001;
+		int alpha = Integer.MIN_VALUE;
+		int beta = Integer.MAX_VALUE;
 		for (int x = 0; x < state.getWidth(); x++) {
 			for (int y = 0; y < state.getHeight(); y++) {
 //				System.out.println("x: " + x);
 //				System.out.println("y: " + y);
-
 				int depth = 0;
 				if (state.getSpace(x,y) == 0) {					//If empty make a temp move
 					Point p = new Point(x,y);
 					BoardModel nextMove = state.placePiece(p, player);	//place piece as AI
-					int minHeuristicValue = minValue(nextMove, depth);						//Check AI's optimal move
+					int minHeuristicValue = minValue(nextMove, depth, alpha, beta);						//Check AI's optimal move
 //					System.out.println("minHeuristicValue: " + minHeuristicValue);
-					if (maxValue < minHeuristicValue && state.getSpace(x,y) == 0) {
+					if (alpha < minHeuristicValue && state.getSpace(x,y) == 0) {
 //						System.out.println("maxValue: " + maxValue);
 						
 //						System.out.println("x,y: " + x +" "+ y);
-						maxValue = minHeuristicValue;
+						alpha = minHeuristicValue;
 						bestMove.x = x;
 						bestMove.y = y;
 					}
@@ -53,36 +54,41 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 		return bestMove;
 	}
 	
-	public int maxValue(BoardModel state, int depth) {
+	public int maxValue(BoardModel state, int depth, int alpha, int beta) {
 		depth++;
 //		System.out.println("depth:" + depth);
-		if (state.winner() != -1 || depth >= DEPTH) {
+		if (state.winner() != -1 || depth >= DEPTH) { // at leaf node
 //			System.out.println("Max Value: " + (heuristic(state)));
-			return heuristic(state);  //Maximize by AI's ways to win - Opponent's ways to win
+			int i = heuristic(state);	//Maximize by AI's ways to win - Opponent's ways to win
+			if (alpha < i) {
+				alpha = i;
+			}
+			return i;  
 		}
-		int maxValue = -10001;
 		for (int x = 0; x < state.getWidth(); x++) {			//Go through entire board
 			for (int y = 0; y < state.getHeight(); y++) {
 				if (state.getSpace(x,y) == 0) {					//If empty make a temp move
 					Point p = new Point(x,y);
 					BoardModel nextMove = state.placePiece(p, player);	//place piece as AI
-					int minHeuristicValue = minValue(nextMove, depth);	//AI checks opponent's optimal move
-					if (maxValue < minHeuristicValue) {					//Get the max of the our ways to win from the Opponent's optimal moves
-						maxValue = minHeuristicValue;
+					int minHeuristicValue = minValue(nextMove, depth, alpha, beta);	//AI checks opponent's optimal move
+					if (alpha < minHeuristicValue) {					//Get the max of the our ways to win from the Opponent's optimal moves
+						alpha = minHeuristicValue;
+					}
+					if (alpha >= beta) {
+						return Integer.MAX_VALUE;
 					}
 				}
 			}
 		}
-		return maxValue;
+		return alpha;
 	}
 	
-	public int minValue(BoardModel state, int depth) {
+	public int minValue(BoardModel state, int depth, int alpha, int beta) {
 		depth++;
 //		System.out.println("depth:" + depth);
 		if (state.winner() != -1 || depth >= DEPTH) {
 			return heuristic(state);  //AI's ways to win - Opponent's ways to win (Want to minimize opponent's ways to win later using this data)
 		}
-		int minValue = 10001;
 		for (int x = 0; x < state.getWidth(); x++) {			 //Go through entire board
 			for (int y = 0; y < state.getHeight(); y++) {
 				if (state.getSpace(x,y) == 0) {					 //If empty make a temp move
@@ -95,15 +101,17 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 //					System.out.println("---------Calling Max Value-----------");
 //					System.out.println("X: " + x);
 //					System.out.println("Y: " + y);
-					int maxHeuristicValue = maxValue(nextMove, depth);  //Opponent checks AI's optimal move
-					if (minValue > maxHeuristicValue) {					//Get the min of the opponent's ways to win from AI's optimal moves
-						minValue = maxHeuristicValue;
-						
+					int maxHeuristicValue = maxValue(nextMove, depth, alpha, beta);  //Opponent checks AI's optimal move
+					if (beta > maxHeuristicValue) {					//Get the min of the opponent's ways to win from AI's optimal moves
+						beta = maxHeuristicValue;
+					}
+					if (alpha >= beta) {
+						return Integer.MIN_VALUE;
 					}
 				}
 			}
 		}
-		return minValue;
+		return beta;
 	}
 	
 	//counts ways that AI can win - Opponent can win
@@ -225,6 +233,7 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 					potentialWins--;
 				}
 				if (opponentPieces == kLength-1) {
+					System.out.println("We Gonna Loooooooooooosssssssssssssseeeeeeeeee");
 					potentialWins -= 10000;
 				}
 				x++;
@@ -266,6 +275,7 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 					potentialWins--;
 				}
 				if (opponentPieces == kLength-1) {
+					System.out.println("We Gonna Loooooooooooosssssssssssssseeeeeeeeee");
 					potentialWins -= 10000;
 				}
 				x2++;
@@ -309,6 +319,7 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 					potentialWins--;
 				}
 				if (opponentPieces == kLength-1) {
+					System.out.println("We Gonna Loooooooooooosssssssssssssseeeeeeeeee");
 					potentialWins -= 10000;
 				}
 				x++;
@@ -350,6 +361,7 @@ public class UltimateTicTacToeBotAI extends CKPlayer {
 					potentialWins--;
 				}
 				if (opponentPieces == kLength-1) {
+					System.out.println("We Gonna Loooooooooooosssssssssssssseeeeeeeeee");
 					potentialWins -= 10000;
 				}
 				x2++;
