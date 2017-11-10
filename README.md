@@ -5,4 +5,4 @@ Created an AI to play the board game Connect4 on any scale. Implemented with Min
 Implemented in Java. 
 
 
-![Game View](/src/connectKAI.PNG)
+![Game View](./src/connectK.PNG)
